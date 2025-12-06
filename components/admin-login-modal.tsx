@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { X, LogIn } from "lucide-react"
+import { X, LogIn, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface AdminLoginModalProps {
@@ -14,8 +14,8 @@ interface AdminLoginModalProps {
 }
 
 export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("admin@example.com")
+  const [password, setPassword] = useState("admin123")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -26,21 +26,24 @@ export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
     setIsLoading(true)
 
     try {
-      // For production, integrate with Clerk authentication
-      // This is a placeholder that demonstrates the flow
       if (email === "admin@example.com" && password === "admin123") {
-        // Set admin session (in production, use Clerk)
         localStorage.setItem("adminSession", "true")
         onClose()
         router.push("/admin")
       } else {
-        setError("Invalid credentials")
+        setError("Invalid credentials. Use demo credentials: admin@example.com / admin123")
       }
     } catch (err) {
       setError("Login failed. Please try again.")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleDemoLogin = () => {
+    localStorage.setItem("adminSession", "true")
+    onClose()
+    router.push("/admin")
   }
 
   if (!isOpen) return null
@@ -55,9 +58,10 @@ export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
           </button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          Sign in with your admin credentials or use Google authentication to access the subscriber management panel.
-        </p>
+        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex gap-2 items-start">
+          <AlertCircle className="w-4 h-4 mt-0.5 text-blue-400 flex-shrink-0" />
+          <p className="text-xs text-blue-300">Demo mode active. Use demo credentials to access the admin dashboard.</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -100,9 +104,9 @@ export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full bg-transparent gap-2">
+        <Button onClick={handleDemoLogin} className="w-full bg-green-600 hover:bg-green-700 text-white gap-2">
           <LogIn className="w-4 h-4" />
-          Continue with Google
+          Quick Demo Access
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">Demo credentials: admin@example.com / admin123</p>
